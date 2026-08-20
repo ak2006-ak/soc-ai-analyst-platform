@@ -1,118 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SentinelAI - Modern SOC Dashboard</title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelAI | SOC Analyst Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>SentinelAI</span>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="logo"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> SentinelAI</div>
+      <nav class="nav-menu">
+        <button class="nav-item active" data-view="dashboard"><i class="fa-solid fa-chart-line" aria-hidden="true"></i>Dashboard</button>
+        <button class="nav-item" data-view="alerts"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>Alerts & Cases</button>
+        <button class="nav-item" data-view="investigation"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>Investigation</button>
+        <button class="nav-item" data-view="settings"><i class="fa-solid fa-gear" aria-hidden="true"></i>Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <span class="label">Active Analyst</span>
+        <strong id="activeAnalyst">Loading...</strong>
+      </div>
+    </aside>
+
+    <main class="main" id="appMain">
+      <header class="top-header">
+        <div>
+          <h1>SOC AI Analyst Workspace</h1>
+          <p id="pageDescription">Operational overview and current risk posture.</p>
+        </div>
+        <div class="header-actions">
+          <span class="pill" id="apiStatus" role="status" aria-live="polite">Connecting…</span>
+        </div>
+      </header>
+
+      <div class="feedback" id="feedback" hidden></div>
+
+      <section class="view active" id="view-dashboard" aria-label="Dashboard view">
+        <div class="metrics-grid" id="metricsGrid"></div>
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Recent alerts</h2>
+            <button class="btn secondary" id="dashboardRefreshBtn" type="button">Refresh</button>
+          </div>
+          <div id="recentAlertsState" class="state">Loading alerts...</div>
+          <div class="table-wrap" id="recentAlertsTableWrap" hidden>
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Assignee</th><th>Updated</th><th></th></tr>
+              </thead>
+              <tbody id="recentAlertsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-alerts" aria-label="Alerts and cases view">
+        <div class="panel">
+          <div class="panel-header"><h2>Alert intake</h2></div>
+          <form id="ingestForm" class="grid-form">
+            <label>Title<input required name="title" type="text" placeholder="Suspicious process execution"></label>
+            <label>Source<input required name="source" type="text" placeholder="EDR, SIEM, CloudTrail"></label>
+            <label>Severity
+              <select required name="severity">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </label>
+            <label class="span-2">Description<textarea name="description" rows="2" placeholder="Short triage context"></textarea></label>
+            <label class="span-2">Raw log / evidence<textarea name="rawLog" rows="3" placeholder="Paste log lines or evidence"></textarea></label>
+            <button type="submit" class="btn">Ingest alert</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><h2>Alert queue</h2></div>
+          <form class="filters" id="filtersForm">
+            <label>Search<input id="searchInput" type="search" placeholder="ID, title, source, tags"></label>
+            <label>Status
+              <select id="statusFilter">
+                <option value="">All</option>
+                <option value="new">New</option>
+                <option value="triaged">Triaged</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </label>
+            <label>Severity
+              <select id="severityFilter">
+                <option value="">All</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </label>
+            <label>Sort
+              <select id="sortByFilter">
+                <option value="updatedAt">Last Updated</option>
+                <option value="createdAt">Created</option>
+                <option value="severity">Severity</option>
+              </select>
+            </label>
+            <button class="btn secondary" type="submit">Apply</button>
+          </form>
+          <div id="alertsState" class="state">Loading queue...</div>
+          <div class="table-wrap" id="alertsTableWrap" hidden>
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Assignee</th><th>Source</th><th></th></tr>
+              </thead>
+              <tbody id="alertsTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-investigation" aria-label="Investigation detail view">
+        <div id="investigationEmpty" class="panel state">Select an alert from the queue to begin investigation.</div>
+        <div id="investigationPanel" hidden>
+          <div class="panel">
+            <div class="panel-header"><h2 id="investigationTitle">Alert details</h2></div>
+            <p id="investigationMeta" class="muted"></p>
+            <div class="split-controls">
+              <label>Status
+                <select id="detailStatus">
+                  <option value="new">New</option>
+                  <option value="triaged">Triaged</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </label>
+              <label>Severity
+                <select id="detailSeverity">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </label>
+              <label>Assignee
+                <select id="detailAssignee"></select>
+              </label>
+              <button class="btn" type="button" id="saveDetailBtn">Save updates</button>
             </div>
-            <nav class="nav-menu">
-                <button class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</button>
-                <button class="nav-item"><i class="fa-solid fa-robot"></i> AI Chat</button>
-                <button class="nav-item"><i class="fa-solid fa-bug"></i> Threats</button>
-                <button class="nav-item"><i class="fa-solid fa-file-lines"></i> Reports</button>
-                <button class="nav-item"><i class="fa-solid fa-gear"></i> Settings</button>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=2563eb&color=fff" alt="User Avatar" class="avatar">
-                    <div class="user-info">
-                        <span class="user-name">Admin User</span>
-                        <span class="user-role">SOC Analyst</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
+            <h3>AI analysis</h3>
+            <p id="analysisSummary" class="state">No analysis generated yet.</p>
+            <ul id="analysisRecommendations"></ul>
+            <button class="btn secondary" id="analyzeBtn" type="button">Run AI triage</button>
+          </div>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header">
-                <h1>AI Powered SOC Dashboard</h1>
-                <div class="header-actions">
-                    <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
-                    <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
-                </div>
-            </header>
+          <div class="panel">
+            <div class="panel-header"><h2>Investigation notes & timeline</h2></div>
+            <form id="noteForm" class="note-form">
+              <label class="sr-only" for="noteMessage">Add note</label>
+              <textarea id="noteMessage" rows="3" placeholder="Document findings, containment actions, or escalation notes"></textarea>
+              <button class="btn" type="submit">Add note</button>
+            </form>
+            <ul id="timelineList" class="timeline"></ul>
+          </div>
+        </div>
+      </section>
 
-            <!-- Metrics Cards -->
-            <section class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-icon success"><i class="fa-solid fa-shield-check"></i></div>
-                    <div class="metric-details">
-                        <h3>Security Score</h3>
-                        <h2>96%</h2>
-                        <span class="trend positive"><i class="fa-solid fa-arrow-up"></i> 2% vs last week</span>
-                    </div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                    <div class="metric-details">
-                        <h3>Threats Today</h3>
-                        <h2>12</h2>
-                        <span class="trend negative"><i class="fa-solid fa-arrow-up"></i> 4 new</span>
-                    </div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon danger"><i class="fa-solid fa-skull-crossbones"></i></div>
-                    <div class="metric-details">
-                        <h3>Critical Alerts</h3>
-                        <h2>2</h2>
-                        <span class="trend negative"><i class="fa-solid fa-arrow-up"></i> 1 new</span>
-                    </div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-icon info"><i class="fa-solid fa-server"></i></div>
-                    <div class="metric-details">
-                        <h3>Logs Today</h3>
-                        <h2>15,281</h2>
-                        <span class="trend neutral"><i class="fa-solid fa-minus"></i> Stable</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Chat Interface -->
-            <section class="chat-container">
-                <div class="chat-box" id="chat">
-                    <div class="message ai-message">
-                        <div class="avatar-wrapper"><i class="fa-solid fa-robot"></i></div>
-                        <div class="message-content">
-                            <b>Welcome to SentinelAI.</b><br>
-                            I'm your AI SOC assistant. You can upload a Windows Event Log (.evtx, .log, .txt) or ask me a security question to get started.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Input Area -->
-                <div class="input-area">
-                    <button class="upload-btn" onclick="document.getElementById('file').click()" title="Upload Log File">
-                        <i class="fa-solid fa-paperclip"></i>
-                    </button>
-                    <input type="file" id="file" accept=".evtx,.txt,.log" hidden>
-                    
-                    <div class="input-wrapper">
-                        <input type="text" id="q" placeholder="Ask SentinelAI to analyze a threat..." autocomplete="off">
-                        <button class="send-btn" onclick="analyze()" title="Send Message">
-                            <i class="fa-solid fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="script.js"></script>
+      <section class="view" id="view-settings" aria-label="Settings view">
+        <div class="panel">
+          <div class="panel-header"><h2>Analyst profile simulation</h2></div>
+          <p class="muted">Switch active analyst to simulate ownership and note attribution.</p>
+          <label>Active analyst
+            <select id="analystSelector"></select>
+          </label>
+          <p class="muted">Current role: <strong id="roleValue">-</strong></p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="script.js"></script>
 </body>
 </html>

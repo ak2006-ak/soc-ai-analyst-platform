@@ -1,0 +1,77 @@
+{
+  "users": [
+    {
+      "id": "u-001",
+      "name": "Alex Chen",
+      "role": "Tier-1 Analyst"
+    },
+    {
+      "id": "u-002",
+      "name": "Jordan Patel",
+      "role": "Tier-2 Analyst"
+    },
+    {
+      "id": "u-003",
+      "name": "Morgan Smith",
+      "role": "Incident Commander"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "ALT-1001",
+      "title": "Suspicious encoded PowerShell execution",
+      "description": "EDR detected powershell.exe -enc execution on endpoint WIN-CLIENT-07.",
+      "source": "EDR",
+      "severity": "high",
+      "status": "in_progress",
+      "assignee": "u-001",
+      "createdAt": "2026-08-19T16:17:07.218Z",
+      "updatedAt": "2026-08-19T16:17:07.218Z",
+      "rawLog": "powershell.exe -enc JABzAHM... Parent: winword.exe",
+      "tags": [
+        "powershell",
+        "endpoint"
+      ],
+      "aiSummary": null,
+      "aiConfidence": null,
+      "aiRecommendations": [],
+      "timeline": [
+        {
+          "id": "evt-1",
+          "type": "status",
+          "author": "System",
+          "message": "Alert ingested from EDR connector.",
+          "timestamp": "2026-08-19T16:17:07.218Z"
+        }
+      ]
+    },
+    {
+      "id": "ALT-1002",
+      "title": "Multiple failed VPN logins for privileged account",
+      "description": "Firewall and identity provider reported 18 failed logins within 10 minutes.",
+      "source": "Identity",
+      "severity": "medium",
+      "status": "new",
+      "assignee": null,
+      "createdAt": "2026-08-19T16:17:07.218Z",
+      "updatedAt": "2026-08-19T16:17:07.218Z",
+      "rawLog": "authentication failure user=admin from=185.21.66.9 attempts=18",
+      "tags": [
+        "identity",
+        "vpn"
+      ],
+      "aiSummary": null,
+      "aiConfidence": null,
+      "aiRecommendations": [],
+      "timeline": [
+        {
+          "id": "evt-2",
+          "type": "status",
+          "author": "System",
+          "message": "Alert queued for triage.",
+          "timestamp": "2026-08-19T16:17:07.218Z"
+        }
+      ]
+    }
+  ]
+}
