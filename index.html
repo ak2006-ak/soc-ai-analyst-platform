@@ -1,132 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SentinelAI - SOC Dashboard</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelAI - Modern SOC Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>SentinelAI</span>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active"><i class="fa-solid fa-house"></i> Dashboard</button>
+                <button class="nav-item"><i class="fa-solid fa-robot"></i> AI Chat</button>
+                <button class="nav-item"><i class="fa-solid fa-bug"></i> Threats</button>
+                <button class="nav-item"><i class="fa-solid fa-file-lines"></i> Reports</button>
+                <button class="nav-item"><i class="fa-solid fa-gear"></i> Settings</button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=2563eb&color=fff" alt="User Avatar" class="avatar">
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">SOC Analyst</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-<div class="container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1>AI Powered SOC Dashboard</h1>
+                <div class="header-actions">
+                    <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+                    <button class="icon-btn"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </header>
 
-    <!-- Sidebar -->
+            <!-- Metrics Cards -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon success"><i class="fa-solid fa-shield-check"></i></div>
+                    <div class="metric-details">
+                        <h3>Security Score</h3>
+                        <h2>96%</h2>
+                        <span class="trend positive"><i class="fa-solid fa-arrow-up"></i> 2% vs last week</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="metric-details">
+                        <h3>Threats Today</h3>
+                        <h2>12</h2>
+                        <span class="trend negative"><i class="fa-solid fa-arrow-up"></i> 4 new</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon danger"><i class="fa-solid fa-skull-crossbones"></i></div>
+                    <div class="metric-details">
+                        <h3>Critical Alerts</h3>
+                        <h2>2</h2>
+                        <span class="trend negative"><i class="fa-solid fa-arrow-up"></i> 1 new</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon info"><i class="fa-solid fa-server"></i></div>
+                    <div class="metric-details">
+                        <h3>Logs Today</h3>
+                        <h2>15,281</h2>
+                        <span class="trend neutral"><i class="fa-solid fa-minus"></i> Stable</span>
+                    </div>
+                </div>
+            </section>
 
-    <div class="sidebar">
+            <!-- Chat Interface -->
+            <section class="chat-container">
+                <div class="chat-box" id="chat">
+                    <div class="message ai-message">
+                        <div class="avatar-wrapper"><i class="fa-solid fa-robot"></i></div>
+                        <div class="message-content">
+                            <b>Welcome to SentinelAI.</b><br>
+                            I'm your AI SOC assistant. You can upload a Windows Event Log (.evtx, .log, .txt) or ask me a security question to get started.
+                        </div>
+                    </div>
+                </div>
 
-        <div class="logo">
-            🛡 SentinelAI
-        </div>
-
-        <button>🏠 Dashboard</button>
-
-        <button>🤖 AI Chat</button>
-
-        <button>🐞 Threats</button>
-
-        <button>📄 Reports</button>
-
-        <button>⚙ Settings</button>
-
+                <!-- Input Area -->
+                <div class="input-area">
+                    <button class="upload-btn" onclick="document.getElementById('file').click()" title="Upload Log File">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <input type="file" id="file" accept=".evtx,.txt,.log" hidden>
+                    
+                    <div class="input-wrapper">
+                        <input type="text" id="q" placeholder="Ask SentinelAI to analyze a threat..." autocomplete="off">
+                        <button class="send-btn" onclick="analyze()" title="Send Message">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-
-    <!-- Main -->
-
-    <div class="main">
-
-        <h1>AI Powered SOC Dashboard</h1>
-
-        <div class="cards">
-
-            <div class="card">
-
-                <h3>Security Score</h3>
-
-                <h2>96%</h2>
-
-            </div>
-
-            <div class="card">
-
-                <h3>Threats Today</h3>
-
-                <h2>12</h2>
-
-            </div>
-
-            <div class="card">
-
-                <h3>Critical Alerts</h3>
-
-                <h2>2</h2>
-
-            </div>
-
-            <div class="card">
-
-                <h3>Logs Today</h3>
-
-                <h2>15,281</h2>
-
-            </div>
-
-        </div>
-
-        <div class="chat-box" id="chat">
-
-            <div class="ai">
-
-                👋 <b>Welcome to SentinelAI.</b><br><br>
-
-                Upload a Windows Event Log or ask a SOC question.
-
-            </div>        </div>
-
-        <!-- Bottom Input Area -->
-
-        <div class="bottom">
-
-            <button class="upload-btn" onclick="document.getElementById('file').click()">
-                📤 Upload Log
-            </button>
-
-            <input
-                type="file"
-                id="file"
-                accept=".evtx,.txt,.log"
-                hidden
-            >
-
-            <input
-                type="text"
-                id="q"
-                placeholder="Ask SentinelAI about threats..."
-            >
-
-            <button onclick="analyze()">
-                Analyze
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<script src="script.js"></script>         </div>
-
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>
